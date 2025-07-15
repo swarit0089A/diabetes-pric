@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Diabetes Prediction</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2>Diabetes Prediction System</h2>
+  <form method="POST" action="/predict">
+    {% for label in ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness',
+                     'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age'] %}
+      <label>{{ label }}:</label><br>
+      <input type="number" name="{{ label }}" step="any" required><br><br>
+    {% endfor %}
+    <input type="submit" value="Predict">
+  </form>
+
+  {% if prediction is defined and prediction is not none %}
+    <h3>Result: You are {{ 'Diabetic' if prediction == 1 else 'Not Diabetic' }}</h3>
+    <h4>Probability: {{ probability }}%</h4>
+
+    <canvas id="resultChart" width="400" height="400"></canvas>
+    <script>
+      // Use safe JS variables for chart data
+      const diabeticProbability = parseFloat("{{ probability }}");
+      const nonDiabeticProbability = 100 - diabeticProbability;
+
+      const ctx = document.getElementById('resultChart');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Diabetic', 'Not Diabetic'],
+          datasets: [{
+            label: 'Prediction',
+            data: [diabeticProbability, nonDiabeticProbability],
+            backgroundColor: ['#e74c3c', '#2ecc71'],
+          }]
+        }
+      });
+    </script>
+  {% endif %}
+</body>
+</html>
+
+
